@@ -182,22 +182,33 @@ at model => user.rb
                                             end
 
 
-Validates Email                           below are from user_spec.rb :
+            CURRENTLY THE EMAIL DOTNT HAVE A INDEX : rails g migration add_index_to_users_email
 
-                                            it 'cannot have an invalid address' do
-                                            invalid_addresses = %w[user@example,com user_at_foo.org user.name@example.
-                                            foo@bar_baz.com foo@bar+baz.com]
+            at Migration file :
 
-                                            invalid_addresses.each do |invalid_address|
-                                              @user.email = invalid_address
-                                              expect(@user).not_to be_valid
+                                            class AddIndexToUsersEmail < ActiveRecord::Migration[5.0]
+                                              def change
+                                                add_index :users, :email, unique: true
                                               end
                                             end
 
-                                            it 'must have a unique email address' do
-                                              @user = User.new(first_name: 'Jane', last_name: 'Doe', email: 'PIERRE@example.com')
-                                              expect(@user).not_to be_valid
+
+Validates Email                           below are from user_spec.rb :
+
+                                          it 'cannot have an invalid address' do
+                                          invalid_addresses = %w[user@example,com user_at_foo.org user.name@example.
+                                          foo@bar_baz.com foo@bar+baz.com]
+
+                                          invalid_addresses.each do |invalid_address|
+                                            @user.email = invalid_address
+                                            expect(@user).not_to be_valid
                                             end
+                                          end
+
+                                          it 'must have a unique email address' do
+                                            @user = User.new(first_name: 'Jane', last_name: 'Doe', email: 'PIERRE@example.com')
+                                            expect(@user).not_to be_valid
+                                          end
 
 
 modify user.rb to
@@ -213,3 +224,81 @@ modify user.rb to
                                           validates :email, presence: true, length: { minimum: 10, maximun: 50}, format: { with: VALID_EMAIL_REGEX },
                                               uniqueness: { case_sensitive: false }
                                         end
+
+Validates Password                       user_spec.rb
+
+
+                                      it 'must have a non blank password' do
+                                        @user.password = @user.password_confirmation = ' ' * 6
+                                        expect(@user).not_to be_valid
+                                      end
+
+                                      it 'must have a password with a minimum length' do
+                                        @user.password = @user.password_confirmation = 'a' * 5
+                                        expect(@user).not_to be_valid
+                                      end
+modify user.rb to
+
+                                  class User < ApplicationRecord
+
+                                    before_save {self.email = email.downcase}
+
+                                    validates :first_name, presence: true, length: {minimum: 3, maximum: 20}
+                                    validates :last_name, presence: true, length: {minimum: 3, maximum: 20}
+
+                                    VALID_EMAIL_REGEX = /\A([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i
+                                    validates :email, presence: true, length: { minimum: 10, maximun: 50}, format: { with: VALID_EMAIL_REGEX },
+                                        uniqueness: { case_sensitive: false }
+
+                                      has_secure_password
+                                      validates :password, presence: true, length: { minimum: 6 }
+                                  end
+
+
+CREATE SHOW VIEW
+
+
+                                      Rails.application.routes.draw do
+                                        resources :users
+                                        root 'static_pages#index'
+
+                                        get '/help', to: 'static_pages#help'
+                                        get 'signup', to: 'users#new'
+
+                                        # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+                                      end
+
+              NOTE:  IF U CHECK RAILS ROUTES, THERE'S NO SIGNUP, IT DOESNT EXIST, SO WHEN U DO THE FOLLOWING
+
+              get 'signup', to: 'users#new'     => IT WILL BRINGS localhost:3000/signup  to  users/new ( CONTROLLER: USERS, VIEW: NEW)
+
+
+
+          stylesheets/customized_style.scss
+
+                                        :root {
+                                          font-size: calc(0.5em + 0.7vw);
+                                        }
+
+                                        h1.title {
+                                        text-align: center;
+                                         }
+
+                                        //Signin forms
+                                        #sign_up {
+                                          margin-top: 1rem;
+                                          text-align: center;
+                                        }
+
+          users/show.html.erb
+
+                                      <%= provide(:title, @user.last_name) %>
+
+                                      <div class="row">
+                                        <div class="small-12 medium-12 columns">
+                                         <h1 class="title">
+                                          <%= gravatar_for @user %>
+                                          <%= @user.first_name + ' ' + @user.last_name %>
+                                          </h1>
+                                        </div>
+                                      </div>
