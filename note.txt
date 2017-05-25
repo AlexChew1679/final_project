@@ -110,7 +110,7 @@ create rspec
           at .rspec
           --color - to give the error message color
 
-          -- format documentation     => it give us more readable information when we test
+          --format documentation     => it give us more readable information when we test
 
 at model user.rb
 
@@ -374,7 +374,7 @@ at application.html.erb =>
 NOTE:
 
 
-Foundation Rails Helper Build Status
+Foundation Rails Helper Build Status  =>  gem 'foundation_rails_helper'
 Gem for Rails 4.1+ applications that use the excellent Zurb Foundation framework.
 Includes:
 A custom FormBuilder that generates a form using the Foundation framework classes. It replaces the current form_for,
